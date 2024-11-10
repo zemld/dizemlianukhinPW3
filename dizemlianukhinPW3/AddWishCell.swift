@@ -28,12 +28,11 @@ final class AddWishCell: UITableViewCell {
         static let borderWidth: CGFloat = 1
     }
     
-    // MARK: - Variables
-    var addWish: ((String) -> ())?
-    
-    // MARK: - Private variables
     private let wish: UITextView = UITextView()
     private let addWishButton: UIButton = UIButton(type: .system)
+    
+    // MARK: - Variables
+    var addWish: ((String) -> ())?
     
     // MARK: - Lifecycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {

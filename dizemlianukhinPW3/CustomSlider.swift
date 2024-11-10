@@ -17,7 +17,6 @@ final class CustomSlider: UIView {
     
     // MARK: - Variables
     var valueChanged: ((Double) -> Void)?
-    
     var slider = UISlider()
     var titleView = UILabel()
     

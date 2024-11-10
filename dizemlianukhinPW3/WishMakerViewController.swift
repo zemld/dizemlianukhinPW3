@@ -40,12 +40,13 @@ final class WishMakerViewController: UIViewController {
         static let textForAddingWish: String = "Add wish"
     }
     
+    private let addWishButton: UIButton = UIButton(type: .system)
+    
     // MARK: - Variables
     private var titleView: UILabel = UILabel()
     private var descriptionView: UILabel = UILabel()
     private var toggleButton: UIButton = UIButton()
     private var slidersStack: UIStackView = UIStackView()
-    private let addWishButton: UIButton = UIButton(type: .system)
     
     private var areSlidersVisible: Bool = true
     
