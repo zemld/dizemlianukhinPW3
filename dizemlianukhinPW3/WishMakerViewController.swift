@@ -34,16 +34,16 @@ final class WishMakerViewController: UIViewController {
     }
     
     // MARK: - Variables
-    var titleView: UILabel = UILabel()
-    var descriptionView: UILabel = UILabel()
-    var toggleButton: UIButton = UIButton()
-    var slidersStack: UIStackView = UIStackView()
+    private var titleView: UILabel = UILabel()
+    private var descriptionView: UILabel = UILabel()
+    private var toggleButton: UIButton = UIButton()
+    private var slidersStack: UIStackView = UIStackView()
     
-    var areSlidersVisible: Bool = true
+    private var areSlidersVisible: Bool = true
     
-    var redValue: CGFloat = 0
-    var greenValue: CGFloat = 0
-    var blueValue: CGFloat = 0
+    private var redValue: CGFloat = 0
+    private var greenValue: CGFloat = 0
+    private var blueValue: CGFloat = 0
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
