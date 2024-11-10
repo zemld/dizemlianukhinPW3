@@ -19,7 +19,7 @@ final class AddWishCell: UITableViewCell {
         static let wishLabelOffset: CGFloat = 8
         
         static let wishText: String = "Enter a wish"
-        static let textViewHeight: CGFloat = 100
+        static let textViewHeight: CGFloat = 80
         static let buttonHeight: CGFloat = 50
         static let margin: CGFloat = 16
         static let buttonTitle: String = "Add Wish"
@@ -53,36 +53,79 @@ final class AddWishCell: UITableViewCell {
     }
     
     // MARK: - Private methods
+    
     private func configureUI() {
         let wrap: UIView = UIView()
-        addSubview(wrap)
+        contentView.addSubview(wrap)
         
         wrap.backgroundColor = Constants.wrapColor
         wrap.layer.cornerRadius = Constants.wrapRadius
-        wrap.pinVertical(to: self, Constants.wrapOffsetVertical)
-        wrap.pinHorizontal(to: self, Constants.wrapOffsetHorizontal)
+        wrap.translatesAutoresizingMaskIntoConstraints = false
         
         wrap.addSubview(wish)
-        wish.pin(to: wrap, Constants.wishLabelOffset)
         wrap.addSubview(addWishButton)
         
+        // Настройка wish
         wish.backgroundColor = .clear
         wish.layer.borderColor = UIColor.lightGray.cgColor
         wish.layer.borderWidth = Constants.borderWidth
         wish.layer.cornerRadius = Constants.cornerRadius
         wish.text = Constants.wishText
-        wish.textColor = .lightGray
+        wish.textColor = .black
         wish.translatesAutoresizingMaskIntoConstraints = false
         
+        // Настройка addWishButton
         addWishButton.setTitle(Constants.buttonTitle, for: .normal)
         addWishButton.layer.cornerRadius = Constants.cornerRadius
         addWishButton.backgroundColor = .systemGray6
         addWishButton.addTarget(self, action: #selector(addWishButtonPressed), for: .touchUpInside)
         addWishButton.translatesAutoresizingMaskIntoConstraints = false
         
-        addWishButton.topAnchor.constraint(equalTo: wish.bottomAnchor, constant: Constants.margin).isActive = true
+        // Установка констрейнтов с использованием методов из UIView+Pin
+        wrap.pinTop(to: contentView.topAnchor, Constants.wrapOffsetVertical)
+        wrap.pinBottom(to: contentView.bottomAnchor, Constants.wrapOffsetVertical)
+        wrap.pinHorizontal(to: contentView, Constants.wrapOffsetHorizontal)
+        
+        wish.pinTop(to: wrap.topAnchor, Constants.wishLabelOffset)
+        wish.pinHorizontal(to: wrap, Constants.wishLabelOffset)
+        wish.setHeight(Constants.textViewHeight) // Устанавливаем минимальную высоту
+
+        addWishButton.pinTop(to: wish.bottomAnchor, Constants.margin)
         addWishButton.pinHorizontal(to: wrap, Constants.margin)
+        addWishButton.pinBottom(to: wrap.bottomAnchor, Constants.wrapOffsetVertical)
+        addWishButton.setHeight(Constants.buttonHeight)
     }
+//    private func configureUI() {
+//        let wrap: UIView = UIView()
+//        contentView.addSubview(wrap)
+//        
+//        wrap.backgroundColor = Constants.wrapColor
+//        wrap.layer.cornerRadius = Constants.wrapRadius
+//        wrap.pinVertical(to: self, Constants.wrapOffsetVertical)
+//        wrap.pinHorizontal(to: self, Constants.wrapOffsetHorizontal)
+//        
+//        wrap.addSubview(wish)
+//        wish.pin(to: wrap, Constants.wishLabelOffset)
+//        wrap.addSubview(addWishButton)
+//        
+//        wish.backgroundColor = .clear
+//        wish.layer.borderColor = UIColor.lightGray.cgColor
+//        wish.layer.borderWidth = Constants.borderWidth
+//        wish.layer.cornerRadius = Constants.cornerRadius
+//        wish.text = Constants.wishText
+//        wish.textColor = .black
+//        wish.translatesAutoresizingMaskIntoConstraints = false
+//        wish.setHeight(Constants.textViewHeight)
+//        
+//        addWishButton.setTitle(Constants.buttonTitle, for: .normal)
+//        addWishButton.layer.cornerRadius = Constants.cornerRadius
+//        addWishButton.backgroundColor = .systemGray6
+//        addWishButton.addTarget(self, action: #selector(addWishButtonPressed), for: .touchUpInside)
+//        addWishButton.translatesAutoresizingMaskIntoConstraints = false
+//        
+//        addWishButton.topAnchor.constraint(equalTo: wrap.bottomAnchor, constant: Constants.margin).isActive = true
+//        addWishButton.pinHorizontal(to: wrap, Constants.margin)
+//    }
     
     // MARK: - Actions
     @objc
