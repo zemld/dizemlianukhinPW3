@@ -12,10 +12,13 @@ final class WishStoringViewController: UIViewController {
     private enum Constants {
         static let tableCornerRadius: CGFloat = 10
         static let tableOffset: CGFloat = 30
+        
+        static let firstWish: String = "I wish to add cells to the table"
     }
     
     // MARK: - Variables
     private let table: UITableView = UITableView(frame: .zero)
+    private var wishArray: [String] = [Constants.firstWish]
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -32,18 +35,23 @@ final class WishStoringViewController: UIViewController {
         table.layer.cornerRadius = Constants.tableCornerRadius
         
         table.pin(to: view, Constants.tableOffset)
+        
+        table.register(WrittenWishCell.self, forCellReuseIdentifier: WrittenWishCell.reuseId)
     }
 }
 
 // MARK: - UITableViewDataSource
 extension WishStoringViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return wishArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return UITableViewCell()
+        let cell = tableView.dequeueReusableCell(withIdentifier: WrittenWishCell.reuseId, for: indexPath)
+        
+        guard let wishCell = cell as? WrittenWishCell else { return cell }
+        wishCell.configure(with: wishArray[indexPath.row])
+        
+        return wishCell
     }
-    
-    
 }
