@@ -122,18 +122,21 @@ final class WishMakerViewController: UIViewController {
         ])
         
         sliderRed.valueChanged = { [weak self] value in
-                    self?.redValue = CGFloat(value)
-                    self?.updateBackgroundColor()
+            self?.redValue = CGFloat(value)
+            self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
                 
         sliderGreen.valueChanged = { [weak self] value in
             self?.greenValue = CGFloat(value)
             self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
                 
         sliderBlue.valueChanged = { [weak self] value in
             self?.blueValue = CGFloat(value)
             self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
     }
     
@@ -194,7 +197,18 @@ final class WishMakerViewController: UIViewController {
     }
     
     private func updateBackgroundColor() {
-        view.backgroundColor = UIColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1)
+        view.backgroundColor = getCurrentColor()
+    }
+    
+    private func updateButtonTitleColor() {
+        for item in actionStack.arrangedSubviews {
+            guard let btn = item as? UIButton else { continue }
+            btn.setTitleColor(getCurrentColor(), for: .normal)
+        }
+    }
+    
+    private func getCurrentColor() -> UIColor {
+        return UIColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1)
     }
     
     @objc
