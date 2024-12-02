@@ -153,7 +153,7 @@ final class WishMakerViewController: UIViewController {
         configureAddWishButton()
         configureScheduleWishesButton()
         
-        actionStack.pinBottom(to: view, Constants.bottomAnchor)
+        actionStack.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, Constants.bottomAnchor)
         actionStack.pinHorizontal(to: view, Constants.sidesSpace)
     }
     

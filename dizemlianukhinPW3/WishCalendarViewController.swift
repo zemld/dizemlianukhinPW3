@@ -5,6 +5,7 @@
 //  Created by Denis Zemlyanukhin on 30.11.2024.
 //
 
+import CoreData
 import UIKit
 
 final class WishCalendarViewController: UIViewController {
@@ -13,29 +14,49 @@ final class WishCalendarViewController: UIViewController {
         static let inset: CGFloat = 5
         static let contentInset: UIEdgeInsets = .init(top: inset, left: inset, bottom: inset, right: inset)
         static let cellHeight: CGFloat = 150
+        static let userDefaultsKey: String = "scheduledWishes"
+        
+        static let spacingFromEdges: CGFloat = 40
+        static let buttonBottomAnchor: CGFloat = 30
+        static let buttonHeight: CGFloat = 60
+        static let buttonTitle: String = "Add scheduled wish"
+        static let cornerRadius: CGFloat = 20
     }
+    
     private let colletionView: UICollectionView = UICollectionView(
         frame: .zero,
         collectionViewLayout: UICollectionViewFlowLayout()
     )
     
+    private let addScheduledWishButton: UIButton = UIButton()
+    private let defaults = UserDefaults.standard
+    
+    // MARK: - Variables
+    private var scheduledWishes: [WishEventModel] = []
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .gray
+        loadScheduledWishes()
         configureColletion()
+        configureAddScheduledWishButton()
     }
     
     // MARK: - Private methods
+    private func loadScheduledWishes() {
+        if let data = UserDefaults.standard.data(forKey: Constants.userDefaultsKey),
+           let wishes = try? JSONDecoder().decode([WishEventModel].self, from: data) {
+            scheduledWishes = wishes
+        }
+    }
+
     private func configureColletion() {
         colletionView.delegate = self
         colletionView.dataSource = self
         colletionView.backgroundColor = .white
         colletionView.alwaysBounceVertical = true
         colletionView.contentInset = Constants.contentInset
-        
-        // Temporary.
-        colletionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
         
         view.addSubview(colletionView)
         
@@ -53,6 +74,40 @@ final class WishCalendarViewController: UIViewController {
         // Temporary.
         colletionView.register(WishEventCell.self, forCellWithReuseIdentifier: WishEventCell.reuseIdentifier)
     }
+    
+    private func configureAddScheduledWishButton() {
+        view.addSubview(addScheduledWishButton)
+        
+        addScheduledWishButton.pinHorizontal(to: view, Constants.spacingFromEdges)
+        addScheduledWishButton.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, Constants.buttonBottomAnchor)
+        addScheduledWishButton.setHeight(Constants.buttonHeight)
+        addScheduledWishButton.backgroundColor = .systemPink
+        addScheduledWishButton.setTitle(Constants.buttonTitle, for: .normal)
+        addScheduledWishButton.setTitleColor(.white, for: .normal)
+        addScheduledWishButton.layer.cornerRadius = Constants.cornerRadius
+        addScheduledWishButton.addTarget(self, action: #selector(addScheduledWishButtonTapped), for: .touchUpInside)
+    }
+    
+    @objc
+    private func addScheduledWishButtonTapped() {
+        let wishEventCreationView = WishEventCreationView()
+        
+        wishEventCreationView.onAddWish = { [weak self] newWish in
+            guard let self = self else { return }
+            self.scheduledWishes.append(newWish)
+            self.saveScheduledWishes()
+            self.colletionView.reloadData()
+        }
+        
+        present(wishEventCreationView, animated: true)
+        
+    }
+    
+    private func saveScheduledWishes() {
+        if let data = try? JSONEncoder().encode(scheduledWishes) {
+            UserDefaults.standard.set(data, forKey: Constants.userDefaultsKey)
+        }
+    }
 }
 
 // MARK: - UIColletionViewDelegate
@@ -69,19 +124,25 @@ extension WishCalendarViewController: UICollectionViewDelegateFlowLayout {
 // MARK: - UIColletionViewDataSource
 extension WishCalendarViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        return scheduledWishes.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WishEventCell.reuseIdentifier, for: indexPath)
         guard let wishEventCell = cell as? WishEventCell else { return cell }
-        wishEventCell.configure(with: WishEventModel(
-            title: "Test",
-            description: "Test description",
-            startDate: "Start date",
-            endDate: "End date"
-        ))
+        
+        let wishEvent = scheduledWishes[indexPath.item]
+        wishEventCell.configure(with: wishEvent)
+        saveScheduledWishes()
         
         return wishEventCell
     }
+}
+
+// MARK: - WishEventModel
+struct WishEventModel: Codable {
+    let title: String
+    let description: String
+    let startDate: String
+    let endDate: String
 }
