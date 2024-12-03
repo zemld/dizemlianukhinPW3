@@ -30,6 +30,7 @@ final class WishCalendarViewController: UIViewController {
     
     private let addScheduledWishButton: UIButton = UIButton()
     private let defaults = UserDefaults.standard
+    private let calendarManager: CalendarManager = CalendarManager()
     
     // MARK: - Variables
     private var scheduledWishes: [WishEventModel] = []
@@ -71,7 +72,6 @@ final class WishCalendarViewController: UIViewController {
             layout.invalidateLayout()
         }
         
-        // Temporary.
         colletionView.register(WishEventCell.self, forCellWithReuseIdentifier: WishEventCell.reuseIdentifier)
     }
     
@@ -94,13 +94,27 @@ final class WishCalendarViewController: UIViewController {
         
         wishEventCreationView.onAddWish = { [weak self] newWish in
             guard let self = self else { return }
+
+            let calendarEvent = CalendarEventModel(
+                eventTitle: newWish.title,
+                eventNote: newWish.description,
+                eventStartDate: newWish.startDate,
+                eventEndDate: newWish.endDate
+            )
+
+            let isEventCreated = self.calendarManager.create(eventModel: calendarEvent)
+            if isEventCreated {
+                print("Event added to calendar")
+            } else {
+                print("Failed to add event to calendar")
+            }
+            
             self.scheduledWishes.append(newWish)
             self.saveScheduledWishes()
             self.colletionView.reloadData()
         }
         
         present(wishEventCreationView, animated: true)
-        
     }
     
     private func saveScheduledWishes() {
@@ -142,7 +156,7 @@ extension WishCalendarViewController: UICollectionViewDataSource {
 // MARK: - WishEventModel
 struct WishEventModel: Codable {
     let title: String
-    let description: String
-    let startDate: String
-    let endDate: String
+    let description: String?
+    let startDate: Date
+    let endDate: Date
 }

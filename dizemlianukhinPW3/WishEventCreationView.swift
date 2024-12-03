@@ -17,6 +17,8 @@ final class WishEventCreationView: UIViewController {
         
         static let buttonTitle: String = "Add wish"
         static let buttonHeight: CGFloat = 60
+        
+        static let calendarHeigth: CGFloat = 120
     }
     
     // MARK: - Variables
@@ -24,17 +26,17 @@ final class WishEventCreationView: UIViewController {
     
     private var wishTitle: UITextField = UITextField()
     private var wishDescription: UITextField = UITextField()
-    private var startDate: UITextField = UITextField()
-    private var endDate: UITextField = UITextField()
-    
+    private var startDate: UIDatePicker = UIDatePicker()
+    private var endDate: UIDatePicker = UIDatePicker()
     private var addWishButton: UIButton = UIButton()
+    private var calendarManager: CalendarManager = CalendarManager()
     
     public var onAddWish: ((WishEventModel) -> Void)?
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .white
         configureUI()
     }
     
@@ -81,21 +83,21 @@ final class WishEventCreationView: UIViewController {
     }
     
     private func configureStartDate() {
-        startDate.placeholder = "Start date"
+        startDate.datePickerMode = .date
         startDate.backgroundColor = .systemMint
-        startDate.layer.cornerRadius = Constants.cornerRadius
+        startDate.preferredDatePickerStyle = .wheels
         startDate.pinTop(to: wishDescription.bottomAnchor, Constants.spacing)
         startDate.pinHorizontal(to: textFields, Constants.spaceFromEdges)
-        startDate.setHeight(Constants.fieldHeight)
+        startDate.setHeight(Constants.calendarHeigth)
     }
     
     private func configureEndDate() {
-        endDate.placeholder = "End date"
-        endDate.backgroundColor = .systemMint
-        endDate.layer.cornerRadius = Constants.cornerRadius
+        endDate.datePickerMode = .date
+        endDate.minimumDate = startDate.date
+        endDate.preferredDatePickerStyle = .wheels
         endDate.pinTop(to: startDate.bottomAnchor, Constants.spacing)
         endDate.pinHorizontal(to: textFields, Constants.spaceFromEdges)
-        endDate.setHeight(Constants.fieldHeight)
+        endDate.setHeight(Constants.calendarHeigth)
     }
     
     private func configureButton() {
@@ -113,16 +115,28 @@ final class WishEventCreationView: UIViewController {
     @objc
     private func addWishButtonPressed() {
         guard let title = wishTitle.text, !title.isEmpty,
-              let description = wishDescription.text, !description.isEmpty,
-              let start = startDate.text, !start.isEmpty,
-              let end = endDate.text, !end.isEmpty else {
+              let description = wishDescription.text, !description.isEmpty else {
             showAlert("Заполните все поля")
             return
         }
-
-        let wishEvent = WishEventModel(title: title, description: description, startDate: start, endDate: end)
+        
+        let start = startDate.date
+        let end = endDate.date
+        
+        if start > end {
+            showAlert("Дата конца не может быть меньше даты начала")
+            return
+        }
+        
+        let wishEvent = WishEventModel(
+            title: title,
+            description: description,
+            startDate: start,
+            endDate: end
+        )
+        
         onAddWish?(wishEvent)
-        dismiss(animated: true)
+        dismiss(animated: true, completion: nil)
     }
     
     private func showAlert(_ message: String) {
