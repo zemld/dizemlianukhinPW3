@@ -38,6 +38,7 @@ final class WishMakerViewController: UIViewController {
         static let slogan: String = "Create a wish and share it with your friends"
         static let textForHidingSliders: String = "Hide sliders"
         static let textForAddingWish: String = "Add wish"
+        static let textForScheduleWishes: String = "Schedule wish granting"
     }
     
     private let addWishButton: UIButton = UIButton(type: .system)
@@ -46,7 +47,9 @@ final class WishMakerViewController: UIViewController {
     private var titleView: UILabel = UILabel()
     private var descriptionView: UILabel = UILabel()
     private var toggleButton: UIButton = UIButton()
+    private var scheduleWishesButton: UIButton = UIButton(type: .system)
     private var slidersStack: UIStackView = UIStackView()
+    private var actionStack: UIStackView = UIStackView()
     
     private var areSlidersVisible: Bool = true
     
@@ -66,9 +69,8 @@ final class WishMakerViewController: UIViewController {
         
         configureTitle()
         configureDescription()
-        configureAddWishButton()
-        configureToggleButton()
         configureSliders()
+        configureActionStack()
     }
     
     private func configureTitle() {
@@ -116,48 +118,61 @@ final class WishMakerViewController: UIViewController {
         NSLayoutConstraint.activate([
             slidersStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Constants.sidesSpace),
             slidersStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Constants.sidesSpace),
-            slidersStack.bottomAnchor.constraint(equalTo: toggleButton.topAnchor, constant: -Constants.spacing)
+            slidersStack.topAnchor.constraint(equalTo: descriptionView.bottomAnchor, constant: Constants.spacing)
         ])
         
         sliderRed.valueChanged = { [weak self] value in
-                    self?.redValue = CGFloat(value)
-                    self?.updateBackgroundColor()
+            self?.redValue = CGFloat(value)
+            self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
                 
         sliderGreen.valueChanged = { [weak self] value in
             self?.greenValue = CGFloat(value)
             self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
                 
         sliderBlue.valueChanged = { [weak self] value in
             self?.blueValue = CGFloat(value)
             self?.updateBackgroundColor()
+            self?.updateButtonTitleColor()
         }
+    }
+    
+    private func configureActionStack() {
+        actionStack.axis = .vertical
+        view.addSubview(actionStack)
+        actionStack.spacing = Constants.spacing
+        
+        for button in [toggleButton, addWishButton, scheduleWishesButton] {
+            actionStack.addArrangedSubview(button)
+        }
+        
+        configureToggleButton()
+        configureAddWishButton()
+        configureScheduleWishesButton()
+        
+        actionStack.pinBottom(to: view.safeAreaLayoutGuide.bottomAnchor, Constants.bottomAnchor)
+        actionStack.pinHorizontal(to: view, Constants.sidesSpace)
     }
     
     private func configureToggleButton() {
         toggleButton.translatesAutoresizingMaskIntoConstraints = false
         toggleButton.setTitle(Constants.textForHidingSliders, for: .normal)
-        toggleButton.backgroundColor = .systemBlue
+        toggleButton.setTitleColor(.systemPink, for: .normal)
+        toggleButton.backgroundColor = .white
         toggleButton.layer.cornerRadius = Constants.cornerRadius
         toggleButton.addTarget(self, action: #selector(buttonToggled), for: .touchUpInside)
         
-        view.addSubview(toggleButton)
         toggleButton.setHeight(Constants.buttonHeight)
         toggleButton.pinHorizontal(to: view, Constants.sidesSpace)
-        
-        NSLayoutConstraint.activate([
-            toggleButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            toggleButton.bottomAnchor.constraint(equalTo: addWishButton.topAnchor, constant: -Constants.spacing)
-        ])
     }
     
     private func configureAddWishButton() {
         addWishButton.translatesAutoresizingMaskIntoConstraints = false
         
-        view.addSubview(addWishButton)
         addWishButton.setHeight(Constants.buttonHeight)
-        addWishButton.pinBottom(to: view, Constants.bottomAnchor)
         addWishButton.pinHorizontal(to: view, Constants.sidesSpace)
         
         addWishButton.backgroundColor = .white
@@ -168,8 +183,32 @@ final class WishMakerViewController: UIViewController {
         addWishButton.addTarget(self, action: #selector(addWishButtonPressed), for: .touchUpInside)
     }
     
+    private func configureScheduleWishesButton() {
+        scheduleWishesButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        scheduleWishesButton.setHeight(Constants.buttonHeight)
+        scheduleWishesButton.pinHorizontal(to: view, Constants.sidesSpace)
+        
+        scheduleWishesButton.backgroundColor = .white
+        scheduleWishesButton.setTitleColor(.systemPink, for: .normal)
+        scheduleWishesButton.setTitle(Constants.textForScheduleWishes, for: .normal)
+        scheduleWishesButton.layer.cornerRadius = Constants.cornerRadius
+        scheduleWishesButton.addTarget(self, action: #selector(scheduleWishesButtonPressed), for: .touchUpInside)
+    }
+    
     private func updateBackgroundColor() {
-        view.backgroundColor = UIColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1)
+        view.backgroundColor = getCurrentColor()
+    }
+    
+    private func updateButtonTitleColor() {
+        for item in actionStack.arrangedSubviews {
+            guard let btn = item as? UIButton else { continue }
+            btn.setTitleColor(getCurrentColor(), for: .normal)
+        }
+    }
+    
+    private func getCurrentColor() -> UIColor {
+        return UIColor(red: redValue, green: greenValue, blue: blueValue, alpha: 1)
     }
     
     @objc
@@ -190,5 +229,11 @@ final class WishMakerViewController: UIViewController {
     @objc
     private func addWishButtonPressed() {
         present(WishStoringViewController(), animated: true)
+    }
+    
+    @objc
+    private func scheduleWishesButtonPressed() {
+        let vc = WishCalendarViewController()
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

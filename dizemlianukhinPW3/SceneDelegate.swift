@@ -19,6 +19,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.rootViewController = WishMakerViewController()
         self.window = window
         window.makeKeyAndVisible()
+        
+        let navC = UINavigationController(rootViewController: WishMakerViewController())
+        self.window?.rootViewController = navC
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
